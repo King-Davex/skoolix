@@ -1,0 +1,5 @@
+
+c:\Users\USER\Desktop\vibecoding\skoolix>git init 
+Initialized empty Git repository in C:/Users/USER/Desktop/vibecoding/skoolix/.git/
+
+c:\Users\USER\Desktop\vibecoding\skoolix>git add . 
