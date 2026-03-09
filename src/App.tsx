@@ -1680,14 +1680,17 @@ const AdminSignupPage = ({ onSignup, onGoToLogin }: { onSignup: (user: User) => 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password })
       });
+      
+      const data = await res.json();
+      
       if (res.ok) {
-        onSignup(await res.json());
+        onSignup(data);
       } else {
-        const data = await res.json();
         setError(data.error || 'Failed to create admin account');
       }
-    } catch (err) {
-      setError('Connection error');
+    } catch (err: any) {
+      console.error('Fetch error:', err);
+      setError(`Connection Error: ${err.message || 'Check your internet connection and server status.'}`);
     } finally {
       setIsLoading(false);
     }

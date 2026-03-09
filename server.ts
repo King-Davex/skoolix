@@ -100,17 +100,23 @@ app.post('/api/signup', async (req, res) => {
 app.post('/api/admin/signup', async (req, res) => {
   const { username, password, email } = req.body;
 
+  // Diagnostic: Check if environment variables are set
+  if (!supabaseUrl || !supabaseKey) {
+    console.error('⚠️ Supabase environment variables missing in server environment');
+    return res.status(500).json({ error: 'Supabase configuration is missing. Please check your Vercel Environment Variables (SUPABASE_URL and SUPABASE_ANON_KEY).' });
+  }
+
   try {
     // Check if the profiles table exists and can be queried
     const { data: existingUser, error: queryError } = await supabase
       .from('profiles')
       .select('id')
       .or(`username.eq.${username},email.eq.${email}`)
-      .maybeSingle(); // Better than .single() as it doesn't throw if not found
+      .maybeSingle(); 
 
     if (queryError) {
       console.error('Supabase query error during signup:', queryError);
-      return res.status(500).json({ error: `Database error: ${queryError.message}` });
+      return res.status(500).json({ error: `Database error: ${queryError.message}. Make sure you have run the setup_supabase.sql script in your Supabase SQL Editor.` });
     }
 
     if (existingUser) {
