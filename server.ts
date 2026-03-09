@@ -22,6 +22,21 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const app = express();
 app.use(express.json());
 
+// --- Health Check & Test Routes ---
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', time: new Date().toISOString(), env: process.env.NODE_ENV, vercel: !!process.env.VERCEL });
+});
+
+app.get('/api/test-db', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('profiles').select('id').limit(1);
+    if (error) throw error;
+    res.json({ status: 'db_connected', data });
+  } catch (err: any) {
+    res.status(500).json({ status: 'db_error', error: err.message });
+  }
+});
+
 // --- API Routes ---
 
 // Login - Note: In a production app, you would use supabase.auth.signInWithPassword
@@ -86,27 +101,37 @@ app.post('/api/admin/signup', async (req, res) => {
   const { username, password, email } = req.body;
 
   try {
-    const { data: existingUser } = await supabase
+    // Check if the profiles table exists and can be queried
+    const { data: existingUser, error: queryError } = await supabase
       .from('profiles')
       .select('id')
       .or(`username.eq.${username},email.eq.${email}`)
-      .single();
+      .maybeSingle(); // Better than .single() as it doesn't throw if not found
+
+    if (queryError) {
+      console.error('Supabase query error during signup:', queryError);
+      return res.status(500).json({ error: `Database error: ${queryError.message}` });
+    }
 
     if (existingUser) {
       return res.status(400).json({ error: 'Username or email already exists' });
     }
 
-    const { data: newUser, error } = await supabase.from('profiles').insert([{
+    const { data: newUser, error: insertError } = await supabase.from('profiles').insert([{
       username,
       password,
       email,
       role: 'admin' // Forced admin role
     }]).select('id, username, role, email').single();
 
-    if (error) throw error;
+    if (insertError) {
+      console.error('Supabase insert error during signup:', insertError);
+      throw insertError;
+    }
     res.json(newUser);
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    console.error('General error during signup:', err);
+    res.status(500).json({ error: err.message || 'An unexpected server error occurred' });
   }
 });
 
