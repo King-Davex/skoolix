@@ -1681,7 +1681,14 @@ const AdminSignupPage = ({ onSignup, onGoToLogin }: { onSignup: (user: User) => 
         body: JSON.stringify({ username, email, password })
       });
       
-      const data = await res.json();
+      let data;
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        data = { error: text || `Server returned ${res.status} error` };
+      }
       
       if (res.ok) {
         onSignup(data);

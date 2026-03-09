@@ -9,13 +9,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Initialize Supabase Client
-// Use VITE_ for frontend compatibility, but also check for standard env var names for Vercel
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || '';
-
-if (!supabaseUrl || !supabaseKey) {
-  console.warn("⚠️ Warning: SUPABASE_URL or SUPABASE_ANON_KEY is missing in .env");
-}
+// Use placeholders to prevent top-level crash if env vars are missing during build/init
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || 'placeholder';
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -100,10 +96,14 @@ app.post('/api/signup', async (req, res) => {
 app.post('/api/admin/signup', async (req, res) => {
   const { username, password, email } = req.body;
 
-  // Diagnostic: Check if environment variables are set
-  if (!supabaseUrl || !supabaseKey) {
-    console.error('⚠️ Supabase environment variables missing in server environment');
-    return res.status(500).json({ error: 'Supabase configuration is missing. Please check your Vercel Environment Variables (SUPABASE_URL and SUPABASE_ANON_KEY).' });
+  // Diagnostic: Check if environment variables are set correctly (not placeholders)
+  if (!process.env.VITE_SUPABASE_URL && !process.env.SUPABASE_URL) {
+    console.error('⚠️ Supabase URL missing in server environment');
+    return res.status(500).json({ error: 'Supabase URL configuration is missing. Please check your Vercel Environment Variables (SUPABASE_URL).' });
+  }
+  if (!process.env.VITE_SUPABASE_ANON_KEY && !process.env.SUPABASE_ANON_KEY && !process.env.SUPABASE_KEY) {
+    console.error('⚠️ Supabase Key missing in server environment');
+    return res.status(500).json({ error: 'Supabase Key configuration is missing. Please check your Vercel Environment Variables (SUPABASE_ANON_KEY).' });
   }
 
   try {
