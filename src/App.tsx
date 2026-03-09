@@ -21,7 +21,11 @@ import {
   Star,
   Shield,
   Activity,
-  Award
+  Award,
+  Crown,
+  Fingerprint,
+  Mail,
+  ArrowLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { User, Student, Class, Fee, Payment, Result, DashboardStats, Teacher } from './types';
@@ -366,6 +370,230 @@ const LoginPage = ({ onLogin }: { onLogin: (user: User) => void }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9 }}
+          className="text-center text-slate-600 text-xs mt-8 uppercase tracking-widest"
+        >
+          © 2026 Skoolix
+        </motion.p>
+      </motion.div>
+    </div>
+  );
+};
+
+const SignupPage = ({ onSignup, onGoToLogin }: { onSignup: (user: User) => void, onGoToLogin: () => void }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      if (res.ok) {
+        const user = await res.json();
+        onSignup(user);
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Signup failed. Please try again.');
+      }
+    } catch (err) {
+      setError('Connection error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[#0f172a]">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.2, 1],
+            rotate: [0, -90, 0],
+            x: [0, -80, 0],
+            y: [0, 60, 0]
+          }}
+          transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[10%] -right-[10%] w-[40%] h-[40%] bg-emerald-600/20 blur-[120px] rounded-full"
+        />
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.3, 1],
+            rotate: [0, 90, 0],
+            x: [0, 50, 0],
+            y: [0, -100, 0]
+          }}
+          transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-[10%] -left-[10%] w-[50%] h-[50%] bg-indigo-600/20 blur-[120px] rounded-full"
+        />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.05)_0,transparent_70%)]" />
+      </div>
+
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative w-full max-w-[440px] p-4 z-10"
+      >
+        <div className="bg-white/5 backdrop-blur-2xl border border-white/10 p-8 sm:p-10 rounded-[2.5rem] shadow-2xl">
+          <div className="flex flex-col items-center mb-10">
+            <motion.div 
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="mb-6"
+            >
+              <Logo size={80} className="shadow-2xl shadow-emerald-500/20" />
+            </motion.div>
+            <motion.h1 
+              initial={{ y: -10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-3xl font-bold text-white tracking-tight text-center"
+            >
+              Create Account
+            </motion.h1>
+            <motion.p 
+              initial={{ y: -10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="text-slate-400 mt-2 text-center"
+            >
+              Sign up to get started with Skoolix
+            </motion.p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <label className="block text-sm font-medium text-slate-300 mb-2 ml-1">Username</label>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-400 transition-colors">
+                  <UserIcon size={20} />
+                </div>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-4 py-4 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-600"
+                  placeholder="Choose a username"
+                  required
+                />
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
+            >
+              <label className="block text-sm font-medium text-slate-300 mb-2 ml-1">Password</label>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-400 transition-colors">
+                  <Lock size={20} />
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-4 py-4 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-600"
+                  placeholder="Min 6 characters"
+                  required
+                />
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.7 }}
+            >
+              <label className="block text-sm font-medium text-slate-300 mb-2 ml-1">Confirm Password</label>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-emerald-400 transition-colors">
+                  <Shield size={20} />
+                </div>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 text-white pl-12 pr-4 py-4 rounded-2xl focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 outline-none transition-all placeholder:text-slate-600"
+                  placeholder="Re-enter your password"
+                  required
+                />
+              </div>
+            </motion.div>
+
+            <AnimatePresence>
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm py-3 px-4 rounded-xl flex items-center gap-2"
+                >
+                  <AlertCircle size={16} />
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <motion.button
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.8 }}
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-4 rounded-2xl font-bold hover:shadow-lg hover:shadow-emerald-500/25 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed group"
+            >
+              {isLoading ? (
+                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  Create Account
+                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </motion.button>
+          </form>
+
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+            className="mt-8 pt-8 border-t border-white/5 text-center"
+          >
+            <p className="text-slate-500 text-sm">
+              Already have an account? <button onClick={onGoToLogin} className="text-emerald-400 hover:text-emerald-300 transition-colors font-semibold">Sign In</button>
+            </p>
+          </motion.div>
+        </div>
+        
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.0 }}
           className="text-center text-slate-600 text-xs mt-8 uppercase tracking-widest"
         >
           © 2026 Skoolix
@@ -1112,7 +1340,7 @@ const TeachersPage = () => {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
   const [showAdd, setShowAdd] = useState(false);
-  const [newTeacher, setNewTeacher] = useState({ username: '', password: '', class_id: '' });
+  const [newTeacher, setNewTeacher] = useState({ username: '', password: '', email: '', class_id: '' });
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchData = async () => {
@@ -1142,7 +1370,7 @@ const TeachersPage = () => {
     });
     if (res.ok) {
       setShowAdd(false);
-      setNewTeacher({ username: '', password: '', class_id: '' });
+      setNewTeacher({ username: '', password: '', email: '', class_id: '' });
       fetchData();
     } else {
       const data = await res.json();
@@ -1251,6 +1479,10 @@ const TeachersPage = () => {
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2 ml-1">Username</label>
                   <input type="text" required value={newTeacher.username} onChange={e => setNewTeacher({...newTeacher, username: e.target.value})} className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none font-medium" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2 ml-1">Email (Gmail)</label>
+                  <input type="email" value={newTeacher.email} onChange={e => setNewTeacher({...newTeacher, email: e.target.value})} className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none font-medium" placeholder="teacher@gmail.com" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-slate-700 mb-2 ml-1">Password</label>
@@ -1413,10 +1645,491 @@ const SettingsPage = ({ user }: { user: User }) => {
   );
 };
 
-// --- Main App ---
+// --- Admin Signup Page ---
 
+const AdminSignupPage = ({ onSignup, onGoToLogin }: { onSignup: (user: User) => void, onGoToLogin: () => void }) => {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-export default function App() {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setIsLoading(true);
+    setError('');
+    try {
+      const res = await fetch('/api/admin/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password })
+      });
+      if (res.ok) {
+        onSignup(await res.json());
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Failed to create admin account');
+      }
+    } catch (err) {
+      setError('Connection error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[#0a0a0f]">
+      {/* Background blobs same as login */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-600/20 blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-600/20 blur-[120px]" />
+      </div>
+
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative w-full max-w-md p-6 z-10">
+        <div className="bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] p-8 rounded-[2.5rem] shadow-2xl">
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500 flex items-center justify-center mb-4">
+              <Crown size={32} className="text-white" />
+            </div>
+            <h1 className="text-2xl font-black text-white">Create Admin Account</h1>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Username</label>
+              <div className="relative group">
+                <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400" size={18} />
+                <input type="text" value={username} onChange={e => setUsername(e.target.value)} required placeholder="admin_user" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-amber-500/50" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Email (for recovery)</label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400" size={18} />
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="admin@skoolix.com" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-amber-500/50" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Password</label>
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400" size={18} />
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-amber-500/50" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Confirm Password</label>
+              <div className="relative group">
+                <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400" size={18} />
+                <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required placeholder="••••••••" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-amber-500/50" />
+              </div>
+            </div>
+
+            {error && <div className="text-rose-500 text-xs font-semibold bg-rose-500/10 p-3 rounded-xl border border-rose-500/20">{error}</div>}
+
+            <button type="submit" disabled={isLoading} className="w-full bg-amber-500 text-black py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-amber-400 transition-all disabled:opacity-50">
+              {isLoading ? 'Creating...' : 'Create Admin Account'}
+            </button>
+          </form>
+
+          <button onClick={onGoToLogin} className="w-full mt-6 text-slate-500 text-sm font-bold hover:text-white transition-colors">
+            Already have an account? Log In
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+// --- Admin Forgot Password Page ---
+
+const AdminForgotPasswordPage = ({ onGoToLogin }: { onGoToLogin: () => void }) => {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setStatus(null);
+    try {
+      const res = await fetch('/api/admin/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setStatus({ type: 'success', message: data.message });
+      } else {
+        setStatus({ type: 'error', message: data.error });
+      }
+    } catch (err) {
+      setStatus({ type: 'error', message: 'Connection error' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[#0a0a0f]">
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-amber-500/10 blur-[150px]" />
+      </div>
+
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative w-full max-w-md p-6 z-10">
+        <div className="bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] p-8 rounded-[2.5rem] shadow-2xl">
+          <button onClick={onGoToLogin} className="mb-6 flex items-center gap-2 text-slate-500 hover:text-white transition-colors group">
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+            <span className="text-sm font-bold">Back to Login</span>
+          </button>
+
+          <h2 className="text-2xl font-black text-white mb-2">Forgot Password?</h2>
+          <p className="text-slate-500 text-sm mb-8 leading-relaxed">Enter your admin email and we'll send you a link to reset your password.</p>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Admin Email</label>
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400" size={18} />
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="your@email.com" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-amber-500/50" />
+              </div>
+            </div>
+
+            {status && (
+              <div className={`p-4 rounded-xl border text-sm font-medium ${status.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400'}`}>
+                {status.message}
+              </div>
+            )}
+
+            <button type="submit" disabled={isLoading} className="w-full bg-white text-black py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-slate-200 transition-all disabled:opacity-50">
+              {isLoading ? 'Processing...' : 'Send Recovery Link'}
+            </button>
+          </form>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+// --- Admin Login Page ---
+
+const AdminLoginPage = ({ onLogin, onGoToSignup, onGoToForgot }: { 
+  onLogin: (user: User) => void, 
+  onGoToSignup: () => void,
+  onGoToForgot: () => void 
+}) => {
+  const [credential, setCredential] = useState(''); // Can be username or email
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    
+    // Determine if credential is email
+    const isEmail = credential.includes('@');
+    const payload = isEmail ? { email: credential, password } : { username: credential, password };
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const user = await res.json();
+        if (user.role !== 'admin') {
+          setError('Access denied. Admin credentials required.');
+          setIsLoading(false);
+          return;
+        }
+        onLogin(user);
+      } else {
+        setError('Invalid admin credentials.');
+      }
+    } catch (err) {
+      setError('Connection error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[#0a0a0f]">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.4, 1],
+            rotate: [0, 180, 360],
+            x: [0, 80, 0],
+            y: [0, -40, 0]
+          }}
+          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[15%] -left-[15%] w-[45%] h-[45%] bg-amber-600/15 blur-[140px] rounded-full"
+        />
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.2, 1],
+            rotate: [0, -120, 0],
+            x: [0, -60, 0],
+            y: [0, 80, 0]
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-[15%] -right-[15%] w-[50%] h-[50%] bg-orange-600/15 blur-[140px] rounded-full"
+        />
+        {/* Grid overlay */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
+      </div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="relative w-full max-w-[460px] p-4 z-10"
+      >
+        <div className="flex justify-center mb-6">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20">
+            <Crown size={14} className="text-amber-400" />
+            <span className="text-amber-400 text-xs font-black uppercase tracking-[0.2em]">Admin Portal</span>
+          </div>
+        </div>
+
+        <div className="bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] p-8 sm:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+          <div className="flex flex-col items-center mb-10 relative">
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-2xl shadow-amber-500/30 mb-6">
+              <Shield size={40} className="text-white" />
+            </div>
+            <h1 className="text-3xl font-black text-white tracking-tight text-center">Admin Access</h1>
+            <p className="text-slate-500 mt-2 text-center text-sm">Authorized personnel only</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-slate-400 mb-2 ml-1">Username or Email</label>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400 transition-colors">
+                  <UserIcon size={20} />
+                </div>
+                <input
+                  type="text"
+                  value={credential}
+                  onChange={(e) => setCredential(e.target.value)}
+                  className="w-full bg-white/[0.03] border border-white/[0.08] text-white pl-12 pr-4 py-4 rounded-2xl focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/50 outline-none transition-all"
+                  placeholder="Enter admin user or email"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-2 ml-1">
+                <label className="text-sm font-medium text-slate-400">Password</label>
+                <button type="button" onClick={onGoToForgot} className="text-xs font-bold text-amber-500 hover:text-amber-400 transition-colors">Forgot Password?</button>
+              </div>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400 transition-colors">
+                  <Lock size={20} />
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-white/[0.03] border border-white/[0.08] text-white pl-12 pr-4 py-4 rounded-2xl focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/50 outline-none transition-all"
+                  placeholder="••••••••"
+                  required
+                />
+              </div>
+            </div>
+
+            {error && (
+              <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm py-3 px-4 rounded-xl flex items-center gap-2">
+                <AlertCircle size={16} />
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white py-4 rounded-2xl font-black hover:shadow-lg hover:shadow-amber-500/25 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {isLoading ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : "Authenticate"}
+            </button>
+          </form>
+
+          <div className="mt-8 pt-6 border-t border-white/5 text-center">
+            <button onClick={onGoToSignup} className="text-slate-500 text-sm font-bold hover:text-white transition-colors">
+              New Administrator? Create Account
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+// --- Admin Panel (dedicated /admin route) ---
+
+const AdminPanel = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [authMode, setAuthMode] = useState<'login' | 'signup' | 'forgot'>('login');
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1024);
+
+  const handleNav = (tab: string) => {
+    setActiveTab(tab);
+    if (window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    const res = await fetch('/api/dashboard/stats');
+    setStats(await res.json());
+  };
+
+  useEffect(() => {
+    if (user) fetchStats();
+  }, [user, activeTab]);
+
+  if (!user) {
+    if (authMode === 'signup') return <AdminSignupPage onSignup={setUser} onGoToLogin={() => setAuthMode('login')} />;
+    if (authMode === 'forgot') return <AdminForgotPasswordPage onGoToLogin={() => setAuthMode('login')} />;
+    return <AdminLoginPage onLogin={setUser} onGoToSignup={() => setAuthMode('signup')} onGoToForgot={() => setAuthMode('forgot')} />;
+  }
+
+  const adminTabs = [
+    { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { key: 'students', label: 'Students', icon: Users },
+    { key: 'teachers', label: 'Teachers', icon: GraduationCap },
+    { key: 'fees', label: 'Fees', icon: CreditCard },
+    { key: 'results', label: 'Results', icon: FileText },
+    { key: 'settings', label: 'Settings', icon: Settings },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#0f1117] flex">
+      {/* Mobile Sidebar Backdrop */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-30 lg:hidden backdrop-blur-sm"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* Dark Admin Sidebar */}
+      <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-72 bg-[#13141b] border-r border-white/[0.06] transform transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+        <div className="h-full flex flex-col p-6">
+          <div className="flex items-center gap-3 mb-3 px-2">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+              <Crown size={18} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-black text-white tracking-tight">Skoolix</h1>
+              <p className="text-[10px] font-bold text-amber-400 uppercase tracking-[0.15em] -mt-0.5">Admin Panel</p>
+            </div>
+          </div>
+
+          <div className="h-px bg-white/[0.06] my-4" />
+
+          <nav className="flex-1 space-y-1">
+            {adminTabs.map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => handleNav(tab.key)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                  activeTab === tab.key 
+                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' 
+                    : 'text-slate-500 hover:bg-white/[0.04] hover:text-slate-300 border border-transparent'
+                }`}
+              >
+                <tab.icon size={18} />
+                <span className="font-semibold text-sm">{tab.label}</span>
+              </button>
+            ))}
+          </nav>
+
+          <div className="pt-4 border-t border-white/[0.06]">
+            <div className="flex items-center gap-3 px-2 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-600/20 border border-amber-500/20 flex items-center justify-center text-amber-400 font-black text-sm">
+                {user.username[0].toUpperCase()}
+              </div>
+              <div>
+                <p className="text-sm font-bold text-white">{user.username}</p>
+                <div className="flex items-center gap-1">
+                  <Crown size={10} className="text-amber-400" />
+                  <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Administrator</p>
+                </div>
+              </div>
+            </div>
+            <button 
+              onClick={() => setUser(null)}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all"
+            >
+              <LogOut size={18} />
+              <span className="font-semibold text-sm">Logout</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col min-w-0">
+        <header className="h-16 bg-[#13141b]/80 backdrop-blur-xl border-b border-white/[0.06] flex items-center justify-between px-4 lg:px-8 sticky top-0 z-30">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden p-2 text-slate-400">
+              {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-amber-400 text-xs font-bold uppercase tracking-wider">System Online</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-slate-500 text-sm font-medium">{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+          </div>
+        </header>
+
+        <div className="p-4 lg:p-8 max-w-7xl mx-auto w-full">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.25 }}
+            >
+              {activeTab === 'dashboard' && <Dashboard stats={stats} user={user} onNavigate={setActiveTab} />}
+              {activeTab === 'students' && <StudentsPage user={user} />}
+              {activeTab === 'teachers' && <TeachersPage />}
+              {activeTab === 'fees' && <FeesPage />}
+              {activeTab === 'results' && <ResultsPage user={user} />}
+              {activeTab === 'settings' && <SettingsPage user={user} />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+// --- Regular App (non-admin) ---
+
+const RegularApp = () => {
   const [showLanding, setShowLanding] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -1437,11 +2150,24 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (user) fetchStats();
+    if (user) {
+      if (user.role === 'admin') {
+        window.location.href = '/admin';
+        return;
+      }
+      fetchStats();
+    }
   }, [user, activeTab]);
 
   if (showLanding) return <LandingPage onGetStarted={() => setShowLanding(false)} />;
-  if (!user) return <LoginPage onLogin={setUser} />;
+  if (!user) {
+    return <LoginPage onLogin={setUser} />;
+  }
+
+  if (user.role === 'admin') {
+    window.location.href = '/admin';
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -1529,4 +2255,16 @@ export default function App() {
       </main>
     </div>
   );
+};
+
+// --- Main App Router ---
+
+export default function App() {
+  const isAdminRoute = window.location.pathname.startsWith('/admin');
+  
+  if (isAdminRoute) {
+    return <AdminPanel />;
+  }
+
+  return <RegularApp />;
 }

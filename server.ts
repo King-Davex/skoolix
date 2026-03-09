@@ -26,66 +26,151 @@ app.use(express.json());
 // Login - Note: In a production app, you would use supabase.auth.signInWithPassword
 // using an email and password. For this migration, we'll check the 'profiles' table.
 app.post('/api/login', async (req, res) => {
-  const { username, password } = req.body;
-  
-  // Hardcoded fallback for testing before DB is populated
-  if (username === 'admin' && password === 'admin123') {
-    return res.json({ id: '00000000-0000-0000-0000-000000000000', username: 'admin', role: 'admin' });
+  const { username, password, email } = req.body;
+
+  // Hardcoded fallback for testing (email added)
+  if ((username === 'admin' || email === 'admin@skoolix.com') && password === 'admin123') {
+    return res.json({ id: '00000000-0000-0000-0000-000000000000', username: 'admin', role: 'admin', email: 'admin@skoolix.com' });
   }
+  // Hardcoded fallback for testing before DB is populated
+  // Original teacher fallback, updated to include email if needed, but for now just username/password
   if (username === 'teacher' && password === 'teacher123') {
-    return res.json({ id: '11111111-1111-1111-1111-111111111111', username: 'teacher', role: 'teacher' });
+    return res.json({ id: '11111111-1111-1111-1111-111111111111', username: 'teacher', role: 'teacher', email: 'teacher@skoolix.com' });
   }
 
-  const { data: user, error } = await supabase
-    .from('profiles')
-    .select('id, username, role, password')
-    .eq('username', username)
-    .single();
+  let query = supabase.from('profiles').select('id, username, role, password, email');
+
+  if (username) query = query.eq('username', username);
+  else if (email) query = query.eq('email', email);
+  else return res.status(400).json({ error: 'Username or email required' });
+
+  const { data: user } = await query.single();
 
   if (user && (!user.password || user.password === password)) {
-    res.json({ id: user.id, username: user.username, role: user.role });
+    res.json({ id: user.id, username: user.username, role: user.role, email: user.email });
   } else {
     res.status(401).json({ error: 'Invalid credentials or user not found' });
   }
 });
 
+app.post('/api/signup', async (req, res) => {
+  const { username, password, email } = req.body;
+
+  try {
+    const { data: existingUser } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('username', username)
+      .single();
+
+    if (existingUser) {
+      return res.status(400).json({ error: 'Username already exists' });
+    }
+
+    const { data: newUser, error } = await supabase.from('profiles').insert([{
+      username,
+      password,
+      email,
+      role: 'teacher' // Default role for regular signup
+    }]).select('id, username, role, email').single();
+
+    if (error) throw error;
+    res.json(newUser);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/signup', async (req, res) => {
+  const { username, password, email } = req.body;
+
+  try {
+    const { data: existingUser } = await supabase
+      .from('profiles')
+      .select('id')
+      .or(`username.eq.${username},email.eq.${email}`)
+      .single();
+
+    if (existingUser) {
+      return res.status(400).json({ error: 'Username or email already exists' });
+    }
+
+    const { data: newUser, error } = await supabase.from('profiles').insert([{
+      username,
+      password,
+      email,
+      role: 'admin' // Forced admin role
+    }]).select('id, username, role, email').single();
+
+    if (error) throw error;
+    res.json(newUser);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  try {
+    const { data: user } = await supabase.from('profiles').select('id').eq('email', email).single();
+    if (!user) {
+      return res.status(404).json({ error: 'Email not found in our records' });
+    }
+    // Simulation: In reality, use supabase.auth.resetPasswordForEmail(email)
+    res.json({ message: 'A recovery link has been sent to your email.' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/admin/reset-password', async (req, res) => {
+  const { email, newPassword } = req.body;
+  try {
+    const { error } = await supabase.from('profiles').update({ password: newPassword }).eq('email', email);
+    if (error) throw error;
+    res.json({ success: true, message: 'Password reset successfully' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.get('/api/dashboard/stats', async (req, res) => {
   const { teacher_id } = req.query;
-  
+
   try {
     let studentQuery = supabase.from('students').select('id', { count: 'exact' });
     if (teacher_id && teacher_id !== 'admin-id' && teacher_id !== '00000000-0000-0000-0000-000000000000') {
-       // Filter students by teacher's classes
-       const { data: classes } = await supabase.from('classes').select('id').eq('teacher_id', teacher_id);
-       const classIds = classes?.map(c => c.id) || [];
-       if (classIds.length > 0) {
-           studentQuery = studentQuery.in('class_id', classIds);
-       } else {
-           studentQuery = supabase.from('students').select('id', {count: 'exact'}).eq('id', -1); // Return 0 students
-       }
+      // Filter students by teacher's classes
+      const { data: classes } = await supabase.from('classes').select('id').eq('teacher_id', teacher_id);
+      const classIds = (classes || []).map(c => c.id);
+      if (classIds.length > 0) {
+        studentQuery = studentQuery.in('class_id', classIds);
+      } else {
+        studentQuery = supabase.from('students').select('id', { count: 'exact' }).eq('id', -1); // Return 0 students
+      }
     }
-    
+
     const { count: totalStudents } = await studentQuery;
 
     const { data: feeStructure } = await supabase.from('fees').select('amount').order('id', { ascending: false }).limit(1).single();
     const termFee = feeStructure?.amount || 0;
-    
+
     const totalExpected = (totalStudents || 0) * termFee;
-    
+
     const { data: totalCollectedObj } = await supabase.from('payments').select('amount');
-    const collected = totalCollectedObj?.reduce((sum, p) => sum + Number(p.amount), 0) || 0;
-    
+    const collected = (totalCollectedObj || []).reduce((sum, p) => sum + Number(p.amount), 0);
+
     const { data: recentPayments } = await supabase.from('payments')
       .select('*, students(first_name, last_name)')
       .order('payment_date', { ascending: false })
       .limit(5);
 
     // Format recent payments to match frontend expectations
-    const formattedRecentPayments = recentPayments?.map(p => ({
+    const formattedRecentPayments = (recentPayments || []).map(p => ({
       ...p,
-      first_name: p.students?.first_name,
-      last_name: p.students?.last_name
-    })) || [];
+      first_name: (p.students as any)?.first_name,
+      last_name: (p.students as any)?.last_name
+    }));
 
     let teacherName = undefined;
     let classNames = undefined;
@@ -93,9 +178,9 @@ app.get('/api/dashboard/stats', async (req, res) => {
     if (teacher_id && teacher_id !== '00000000-0000-0000-0000-000000000000') {
       const { data: teacher } = await supabase.from('profiles').select('username').eq('id', teacher_id).single();
       const { data: classes } = await supabase.from('classes').select('name').eq('teacher_id', teacher_id);
-      
+
       teacherName = teacher?.username;
-      classNames = classes?.map(c => c.name);
+      classNames = (classes || []).map(c => c.name);
     }
 
     res.json({
@@ -116,7 +201,7 @@ app.get('/api/students', async (req, res) => {
   const { teacher_id } = req.query;
   try {
     let query = supabase.from('students').select('*, classes!inner(name, teacher_id), payments(amount)');
-    
+
     if (teacher_id && teacher_id !== '00000000-0000-0000-0000-000000000000' && teacher_id !== '11111111-1111-1111-1111-111111111111') {
       query = query.eq('classes.teacher_id', teacher_id);
     }
@@ -124,16 +209,16 @@ app.get('/api/students', async (req, res) => {
     const { data: students, error } = await query;
     if (error) throw error;
 
-    const formattedStudents = students?.map(s => {
-      const totalPaid = s.payments?.reduce((sum: number, p: any) => sum + Number(p.amount), 0) || 0;
+    const formattedStudents = (students || []).map(s => {
+      const totalPaid = (s.payments as any)?.reduce((sum: number, p: any) => sum + Number(p.amount), 0) || 0;
       return {
         ...s,
-        class_name: s.classes?.name,
+        class_name: (s.classes as any)?.name,
         paid: totalPaid,
         payments: undefined,
         classes: undefined
       };
-    }) || [];
+    });
 
     res.json(formattedStudents);
   } catch (err: any) {
@@ -163,8 +248,8 @@ app.get('/api/teachers', async (req, res) => {
 });
 
 app.post('/api/teachers', async (req, res) => {
-  const { username, password, class_id } = req.body;
-  
+  const { username, password, email, class_id } = req.body;
+
   // Note: True Supabase Auth flow would use supabase.auth.admin.createUser or signUp
   // For this local migration snippet, we will manually insert into profiles table
   try {
@@ -172,6 +257,7 @@ app.post('/api/teachers', async (req, res) => {
     const { data: newUser, error: userError } = await supabase.from('profiles').insert([{
       username,
       password,
+      email,
       role: 'teacher'
     }]).select('id').single();
 
@@ -182,7 +268,7 @@ app.post('/api/teachers', async (req, res) => {
       const { error: classError } = await supabase.from('classes').update({ teacher_id: teacherId }).eq('id', class_id);
       if (classError) throw classError;
     }
-    
+
     res.json({ id: teacherId });
   } catch (err: any) {
     res.status(400).json({ error: 'Failed to create teacher. ' + err.message });
@@ -250,13 +336,14 @@ app.put('/api/classes/:id', async (req, res) => {
 
 app.get('/api/classes', async (req, res) => {
   try {
-    const { data: classes, error } = await supabase.from('classes').select('*, profiles(username)');
+    const { data: classes, error } = await supabase.from('classes').select('*');
     if (error) throw error;
-    
+
+    const { data: profiles } = await supabase.from('profiles').select('id, username');
+
     const formattedClasses = classes.map(c => ({
       ...c,
-      teacher_name: c.profiles?.username,
-      profiles: undefined
+      teacher_name: profiles?.find(p => p.id === c.teacher_id)?.username || null
     }));
 
     res.json(formattedClasses);
@@ -315,22 +402,22 @@ app.post('/api/results', async (req, res) => {
     try {
       const { data } = await supabase.from('settings').select('value').eq('key', 'grading').single();
       if (data) gradingSystem = JSON.parse(data.value);
-    } catch (e) {}
+    } catch (e) { }
 
     const total = parseFloat(ca_score) + parseFloat(exam_score);
     let grade = 'F';
     if (total >= gradingSystem.a_min) grade = 'A';
     else if (total >= gradingSystem.b_min) grade = 'B';
     else if (total >= gradingSystem.c_min) grade = 'C';
-    
-    const { error } = await supabase.from('results').insert([{ 
-      student_id, 
-      subject, 
-      ca_score: parseFloat(ca_score), 
-      exam_score: parseFloat(exam_score), 
-      grade 
+
+    const { error } = await supabase.from('results').insert([{
+      student_id,
+      subject,
+      ca_score: parseFloat(ca_score),
+      exam_score: parseFloat(exam_score),
+      grade
     }]);
-    
+
     if (error) throw error;
     res.json({ success: true });
   } catch (err: any) {
