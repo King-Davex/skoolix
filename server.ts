@@ -112,9 +112,22 @@ app.post('/api/admin/signup', async (req, res) => {
 app.post('/api/admin/forgot-password', async (req, res) => {
   const { email } = req.body;
   try {
-    const { data: user } = await supabase.from('profiles').select('id').eq('email', email).single();
+    // Check for hardcoded admin
+    if (email === 'admin@skoolix.com' || email === 'admin') {
+      return res.json({ message: 'A recovery link has been sent to your email.' });
+    }
+    
+    // Try to find by email first
+    let { data: user, error: emailError } = await supabase.from('profiles').select('id, email').eq('email', email).maybeSingle();
+    
+    // If not found by email, try by username
     if (!user) {
-      return res.status(404).json({ error: 'Email not found in our records' });
+      const result = await supabase.from('profiles').select('id, email').eq('username', email).maybeSingle();
+      user = result.data;
+    }
+    
+    if (!user) {
+      return res.status(404).json({ error: 'Email or username not found in our records' });
     }
     // Simulation: In reality, use supabase.auth.resetPasswordForEmail(email)
     res.json({ message: 'A recovery link has been sent to your email.' });
