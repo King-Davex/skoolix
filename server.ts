@@ -9,11 +9,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Initialize Supabase Client
-const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || '';
+// Use VITE_ for frontend compatibility, but also check for standard env var names for Vercel
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || '';
 
 if (!supabaseUrl || !supabaseKey) {
-  console.warn("⚠️ Warning: VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY is missing in .env");
+  console.warn("⚠️ Warning: SUPABASE_URL or SUPABASE_ANON_KEY is missing in .env");
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
