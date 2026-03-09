@@ -103,6 +103,12 @@ const LandingPage = ({ onGetStarted }: { onGetStarted: () => void }) => {
             >
               Sign In
             </button>
+            <a 
+              href="/admin"
+              className="ml-3 bg-indigo-500 text-white px-6 py-2.5 rounded-2xl font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-600 hover:-translate-y-0.5 transition-all active:scale-95"
+            >
+              Admin
+            </a>
           </div>
         </div>
       </header>
@@ -741,8 +747,8 @@ const Dashboard = ({ stats, user, onNavigate }: { stats: DashboardStats | null, 
                 <span className="text-xs font-bold">Add Result</span>
               </button>
               {!isTeacher && (
-                <button onClick={() => onNavigate('fees')} className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-50 hover:bg-amber-50 hover:text-amber-600 transition-all group">
-                  <AlertCircle size={20} className="mb-2 text-slate-400 group-hover:text-amber-600" />
+                <button onClick={() => onNavigate('fees')} className="flex flex-col items-center justify-center p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 transition-all group">
+                  <AlertCircle size={20} className="mb-2 text-slate-400 group-hover:text-indigo-600" />
                   <span className="text-xs font-bold">Defaulters</span>
                 </button>
               )}
@@ -1279,7 +1285,7 @@ const ResultsPage = ({ user }: { user: User }) => {
                     <td className="px-8 py-6 text-slate-600 font-medium">{r.exam_score}</td>
                     <td className="px-8 py-6 font-black text-slate-900 text-lg">{r.total_score}</td>
                     <td className="px-8 py-6">
-                      <span className={`inline-flex items-center justify-center w-10 h-10 rounded-xl text-sm font-black ${r.grade === 'A' ? 'bg-emerald-100 text-emerald-700' : r.grade === 'F' ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>
+                      <span className={`inline-flex items-center justify-center w-10 h-10 rounded-xl text-sm font-black ${r.grade === 'A' ? 'bg-emerald-100 text-emerald-700' : r.grade === 'F' ? 'bg-rose-100 text-rose-700' : 'bg-indigo-100 text-indigo-700'}`}>
                         {r.grade}
                       </span>
                     </td>
@@ -1691,14 +1697,14 @@ const AdminSignupPage = ({ onSignup, onGoToLogin }: { onSignup: (user: User) => 
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[#0a0a0f]">
       {/* Background blobs same as login */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-600/20 blur-[120px]" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-600/20 blur-[120px]" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600/20 blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-600/20 blur-[120px]" />
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative w-full max-w-md p-6 z-10">
         <div className="bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] p-8 rounded-[2.5rem] shadow-2xl">
           <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500 flex items-center justify-center mb-4">
+            <div className="w-16 h-16 rounded-2xl bg-indigo-500 flex items-center justify-center mb-4">
               <Crown size={32} className="text-white" />
             </div>
             <h1 className="text-2xl font-black text-white">Create Admin Account</h1>
@@ -1708,35 +1714,35 @@ const AdminSignupPage = ({ onSignup, onGoToLogin }: { onSignup: (user: User) => 
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Username</label>
               <div className="relative group">
-                <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400" size={18} />
-                <input type="text" value={username} onChange={e => setUsername(e.target.value)} required placeholder="admin_user" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-amber-500/50" />
+                <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-400" size={18} />
+                <input type="text" value={username} onChange={e => setUsername(e.target.value)} required placeholder="admin_user" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500/50" />
               </div>
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Email (for recovery)</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400" size={18} />
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="admin@skoolix.com" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-amber-500/50" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-400" size={18} />
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="admin@skoolix.com" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500/50" />
               </div>
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Password</label>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400" size={18} />
-                <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-amber-500/50" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-400" size={18} />
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500/50" />
               </div>
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1.5 ml-1">Confirm Password</label>
               <div className="relative group">
-                <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400" size={18} />
-                <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required placeholder="••••••••" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-amber-500/50" />
+                <Shield className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-400" size={18} />
+                <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required placeholder="••••••••" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500/50" />
               </div>
             </div>
 
             {error && <div className="text-rose-500 text-xs font-semibold bg-rose-500/10 p-3 rounded-xl border border-rose-500/20">{error}</div>}
 
-            <button type="submit" disabled={isLoading} className="w-full bg-amber-500 text-black py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-amber-400 transition-all disabled:opacity-50">
+            <button type="submit" disabled={isLoading} className="w-full bg-indigo-500 text-black py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-400 transition-all disabled:opacity-50">
               {isLoading ? 'Creating...' : 'Create Admin Account'}
             </button>
           </form>
@@ -1783,7 +1789,7 @@ const AdminForgotPasswordPage = ({ onGoToLogin }: { onGoToLogin: () => void }) =
   return (
     <div className="min-h-screen relative flex items-center justify-center overflow-hidden bg-[#0a0a0f]">
       <div className="absolute inset-0 opacity-30 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-amber-500/10 blur-[150px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/10 blur-[150px]" />
       </div>
 
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative w-full max-w-md p-6 z-10">
@@ -1800,8 +1806,8 @@ const AdminForgotPasswordPage = ({ onGoToLogin }: { onGoToLogin: () => void }) =
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Admin Email</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400" size={18} />
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="your@email.com" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-amber-500/50" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-400" size={18} />
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="your@email.com" className="w-full bg-white/[0.05] border border-white/[0.1] text-white pl-12 pr-4 py-3.5 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500/50" />
               </div>
             </div>
 
@@ -1878,7 +1884,7 @@ const AdminLoginPage = ({ onLogin, onGoToSignup, onGoToForgot }: {
             y: [0, -40, 0]
           }}
           transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[15%] -left-[15%] w-[45%] h-[45%] bg-amber-600/15 blur-[140px] rounded-full"
+          className="absolute -top-[15%] -left-[15%] w-[45%] h-[45%] bg-indigo-600/15 blur-[140px] rounded-full"
         />
         <motion.div 
           animate={{ 
@@ -1888,7 +1894,7 @@ const AdminLoginPage = ({ onLogin, onGoToSignup, onGoToForgot }: {
             y: [0, 80, 0]
           }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute -bottom-[15%] -right-[15%] w-[50%] h-[50%] bg-orange-600/15 blur-[140px] rounded-full"
+          className="absolute -bottom-[15%] -right-[15%] w-[50%] h-[50%] bg-purple-600/15 blur-[140px] rounded-full"
         />
         {/* Grid overlay */}
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
@@ -1901,15 +1907,15 @@ const AdminLoginPage = ({ onLogin, onGoToSignup, onGoToForgot }: {
         className="relative w-full max-w-[460px] p-4 z-10"
       >
         <div className="flex justify-center mb-6">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20">
-            <Crown size={14} className="text-amber-400" />
-            <span className="text-amber-400 text-xs font-black uppercase tracking-[0.2em]">Admin Portal</span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20">
+            <Crown size={14} className="text-indigo-400" />
+            <span className="text-indigo-400 text-xs font-black uppercase tracking-[0.2em]">Admin Portal</span>
           </div>
         </div>
 
         <div className="bg-white/[0.03] backdrop-blur-2xl border border-white/[0.08] p-8 sm:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
           <div className="flex flex-col items-center mb-10 relative">
-            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-2xl shadow-amber-500/30 mb-6">
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl shadow-indigo-500/30 mb-6">
               <Shield size={40} className="text-white" />
             </div>
             <h1 className="text-3xl font-black text-white tracking-tight text-center">Admin Access</h1>
@@ -1920,14 +1926,14 @@ const AdminLoginPage = ({ onLogin, onGoToSignup, onGoToForgot }: {
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-2 ml-1">Username or Email</label>
               <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400 transition-colors">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-400 transition-colors">
                   <UserIcon size={20} />
                 </div>
                 <input
                   type="text"
                   value={credential}
                   onChange={(e) => setCredential(e.target.value)}
-                  className="w-full bg-white/[0.03] border border-white/[0.08] text-white pl-12 pr-4 py-4 rounded-2xl focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/50 outline-none transition-all"
+                  className="w-full bg-white/[0.03] border border-white/[0.08] text-white pl-12 pr-4 py-4 rounded-2xl focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/50 outline-none transition-all"
                   placeholder="Enter admin user or email"
                   required
                 />
@@ -1937,17 +1943,17 @@ const AdminLoginPage = ({ onLogin, onGoToSignup, onGoToForgot }: {
             <div>
               <div className="flex justify-between items-center mb-2 ml-1">
                 <label className="text-sm font-medium text-slate-400">Password</label>
-                <button type="button" onClick={onGoToForgot} className="text-xs font-bold text-amber-500 hover:text-amber-400 transition-colors">Forgot Password?</button>
+                <button type="button" onClick={onGoToForgot} className="text-xs font-bold text-indigo-500 hover:text-indigo-400 transition-colors">Forgot Password?</button>
               </div>
               <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-amber-400 transition-colors">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-600 group-focus-within:text-indigo-400 transition-colors">
                   <Lock size={20} />
                 </div>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/[0.03] border border-white/[0.08] text-white pl-12 pr-4 py-4 rounded-2xl focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500/50 outline-none transition-all"
+                  className="w-full bg-white/[0.03] border border-white/[0.08] text-white pl-12 pr-4 py-4 rounded-2xl focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500/50 outline-none transition-all"
                   placeholder="••••••••"
                   required
                 />
@@ -1964,7 +1970,7 @@ const AdminLoginPage = ({ onLogin, onGoToSignup, onGoToForgot }: {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white py-4 rounded-2xl font-black hover:shadow-lg hover:shadow-amber-500/25 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-4 rounded-2xl font-black hover:shadow-lg hover:shadow-indigo-500/25 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {isLoading ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : "Authenticate"}
             </button>
@@ -2035,12 +2041,12 @@ const AdminPanel = () => {
       <aside className={`fixed lg:static inset-y-0 left-0 z-40 w-72 bg-[#13141b] border-r border-white/[0.06] transform transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="h-full flex flex-col p-6">
           <div className="flex items-center gap-3 mb-3 px-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <Crown size={18} className="text-white" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <Logo size={18} className="text-white" />
             </div>
             <div>
               <h1 className="text-lg font-black text-white tracking-tight">Skoolix</h1>
-              <p className="text-[10px] font-bold text-amber-400 uppercase tracking-[0.15em] -mt-0.5">Admin Panel</p>
+              <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.15em] -mt-0.5">Admin Panel</p>
             </div>
           </div>
 
@@ -2053,7 +2059,7 @@ const AdminPanel = () => {
                 onClick={() => handleNav(tab.key)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                   activeTab === tab.key 
-                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' 
+                    ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' 
                     : 'text-slate-500 hover:bg-white/[0.04] hover:text-slate-300 border border-transparent'
                 }`}
               >
@@ -2065,14 +2071,14 @@ const AdminPanel = () => {
 
           <div className="pt-4 border-t border-white/[0.06]">
             <div className="flex items-center gap-3 px-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-600/20 border border-amber-500/20 flex items-center justify-center text-amber-400 font-black text-sm">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-600/20 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-black text-sm">
                 {user.username[0].toUpperCase()}
               </div>
               <div>
                 <p className="text-sm font-bold text-white">{user.username}</p>
                 <div className="flex items-center gap-1">
-                  <Crown size={10} className="text-amber-400" />
-                  <p className="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Administrator</p>
+                  <Crown size={10} className="text-indigo-400" />
+                  <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">Administrator</p>
                 </div>
               </div>
             </div>
@@ -2094,9 +2100,9 @@ const AdminPanel = () => {
             <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="lg:hidden p-2 text-slate-400">
               {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-amber-400 text-xs font-bold uppercase tracking-wider">System Online</span>
+              <span className="text-indigo-400 text-xs font-bold uppercase tracking-wider">System Online</span>
             </div>
           </div>
           <div className="flex items-center gap-4">
