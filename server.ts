@@ -447,14 +447,21 @@ if (process.env.NODE_ENV !== 'production') {
     appType: 'spa',
   });
   app.use(vite.middlewares);
-} else {
+} else if (!process.env.VERCEL) {
+  // Static serving for local production builds (only if not on Vercel)
   app.use(express.static(path.join(__dirname, 'dist')));
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
   });
 }
 
-const PORT = Number(process.env.PORT) || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// Export the app for Vercel serverless functions
+export default app;
+
+// Only start the server if we're not running in a Vercel serverless function environment
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  const PORT = Number(process.env.PORT) || 3000;
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
